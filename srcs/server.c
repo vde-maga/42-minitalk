@@ -10,19 +10,22 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_printf/ft_printf.h"
+#include "ft_printf.h"
+//#include "libftprintf.h"
 #include <signal.h>
+
+#define LIVE 1
 
 void	ft_handle_signal(int signal)
 {
-	char	current_char;
-	int	current_bit;
+	static unsigned char	current_char;
+	static int	current_bit;
 
-	current_char = current_char | (SIGUSR1 = signal);
+	current_char = current_char | (signal == SIGUSR1);
 	current_bit++;
 	if (current_bit == 8)
 	{
-		if (current_bit == END_TRANSMISSION)
+		if (current_char == '\0')
 			ft_printf("\n");
 		else
 			ft_printf("%c", current_char);
@@ -30,8 +33,7 @@ void	ft_handle_signal(int signal)
 		current_char = 0;
 	}
 	else
-			current_char = current_char >> 1;
-
+			current_char = current_char << 1;
 }
 
 int	main(void)
@@ -39,7 +41,7 @@ int	main(void)
 	ft_printf("%d\n", getpid());
 	signal(SIGUSR1, ft_handle_signal);
 	signal(SIGUSR2, ft_handle_signal);
-	while (1)
+	while (LIVE)
 		pause();
 	return (0);
 }

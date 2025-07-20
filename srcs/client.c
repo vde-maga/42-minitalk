@@ -10,8 +10,32 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_printf/ft_print.h"
+#include "ft_printf.h"
+//#include "libftprintf.h"
 #include <signal.h>
+
+int	ft_atoi(const char *nptr)
+{
+	int	result;
+	int	signal;
+
+	result = 0;
+	signal = 1;
+	while (*nptr == ' ' || (*nptr >= 9 && *nptr <= 13))
+		nptr++;
+	if (*nptr == '+' || *nptr == '-')
+	{
+		if (*nptr == '-')
+			signal = signal * -1;
+		nptr++;
+	}
+	while (*nptr >= '0' && *nptr <= '9')
+	{
+		result = (result * 10) + (*nptr - '0');
+		nptr++;
+	}
+	return (result * signal);
+}
 
 void	send_signal(int pid, unsigned char character)
 {
@@ -39,15 +63,12 @@ int	main(int argc, char **argv)
 	int	i;
 
 	if (argc != 3)
-	{
 		ft_printf("Usage: ./minitalk <pid> <message>\n");
-		exit(EXIT_FAILURE);
-	}
-	server_pid = ft_atoi(argv[1]);
+	server_id = ft_atoi(argv[1]);
 	message = argv[2];
 	i = -1;
 	while (message[++i])
-		send_signal(server_pid, message[i]);
-	send_signal(server_pid, '\0');
+		send_signal(server_id, message[i]);
+	send_signal(server_id, '\0');
 	return (0);
 }

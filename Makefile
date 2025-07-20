@@ -10,47 +10,46 @@
 #                                                                              #
 # **************************************************************************** #
 
-NAME = minitalk
 CC = cc
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -I$(PRINT_PATH)
+CLIENT_SRCS = srcs/client.c
+SERVER_SRCS = srcs/server.c
+CLIENT_BONUS_SRCS = srcs/client_bonus.c
+SERVER_BONUS_SRCS = srcs/server_bonus.c
+PRINT_PATH = srcs/ft_printf
+PRINT_ARCHIVE = $(PRINT_PATH)/libftprintf.a
+CLIENT_NAME = client
+SERVER_NAME = server
+CLIENT_BONUS_NAME = client_bonus
+SERVER_BONUS_NAME = server_bonus
 
-SRCS := $(shell find srcs -name "*.c")
+all: $(CLIENT_NAME) $(SERVER_NAME)
 
-OBJDIR = objs
-OBJS = $(SRCS:srcs/%.c=$(OBJDIR)/%.o)
-INCDIR = includes
+$(CLIENT_NAME): $(CLIENT_SRCS) $(PRINT_ARCHIVE)
+	$(CC) $(CFLAGS) -o $@ $(CLIENT_SRCS) -L$(PRINT_PATH) -lftprintf
 
-GREEN = \033[0;32m
-RED = \033[0;31m
-YELLOW = \033[0;33m
-CYAN = \033[0;36m
-MAGENTA = \033[0;35m
-BOLD = \033[1m
-RESET = \033[0m
+$(SERVER_NAME): $(SERVER_SRCS) $(PRINT_ARCHIVE)
+	$(CC) $(CFLAGS) -o $@ $(SERVER_SRCS) -L$(PRINT_PATH) -lftprintf
 
-all: $(NAME)
+$(CLIENT_BONUS_NAME): $(CLIENT_BONUS_SRCS) $(PRINT_ARCHIVE)
+	$(CC) $(CFLAGS) -o $@ $(CLIENT_BONUS_SRCS) -L$(PRINT_PATH) -lftprintf
 
-$(NAME): $(OBJS)
-	@echo  "$(CYAN)\n Linking all Objects to Create $(NAME) $(RESET)"
-	$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
-	@echo  "$(GREEN) Done! Run with ./$(NAME) $(RESET)"
+$(SERVER_BONUS_NAME): $(SERVER_BONUS_SRCS) $(PRINT_ARCHIVE)
+	$(CC) $(CFLAGS) -o $@ $(SERVER_BONUS_SRCS) -L$(PRINT_PATH) -lftprintf
 
-$(OBJDIR)/%.o: srcs/%.c
-	@mkdir -p $(dir $@)
-	@echo  "$(CYAN)\n Compiling $(RESET)"
-	$(CC) $(CFLAGS) -I$(INCDIR) -c $< -o $@
-	@echo  "$(GREEN) Done Compiling $(RESET)"
+$(PRINT_ARCHIVE):
+	$(MAKE) -C $(PRINT_PATH)
 
 clean:
-	@echo  "$(CYAN)\n Cleaning Object Files $(RESET)"
-	rm -rf $(OBJDIR)
-	@echo  "$(GREEN) Done Cleaning Object Files $(RESET)"
+	$(MAKE) -C $(PRINT_PATH) clean
 
 fclean: clean
-	@echo  "$(CYAN)\n Removing $(NAME) $(RESET)"
-	rm -f $(NAME)
-	@echo  "$(GREEN) Removed $(NAME) $(RESET)"
+	$(MAKE) -C $(PRINT_PATH) fclean
+	rm -f $(CLIENT_NAME) $(SERVER_NAME) $(CLIENT_BONUS_NAME) $(SERVER_BONUS_NAME)
 
 re: fclean all
 
-.PHONY: all clean fclean re
+bonus: $(CLIENT_BONUS_NAME) $(SERVER_BONUS_NAME)
+
+.PHONY: all clean fclean re bonus
+
