@@ -6,40 +6,39 @@
 /*   By: vde-maga <vde-maga@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 16:45:50 by vde-maga          #+#    #+#             */
-/*   Updated: 2025/07/16 16:45:50 by vde-maga         ###   ########.fr       */
+/*   Updated: 2025/07/21 17:31:31 by vde-maga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_printf.h"
-//#include "libftprintf.h"
+#include <unistd.h>
 #include <signal.h>
 
-int	ft_atoi(const char *nptr)
+int	ft_atoi(const char *str)
 {
 	int	result;
 	int	signal;
 
 	result = 0;
 	signal = 1;
-	while (*nptr == ' ' || (*nptr >= 9 && *nptr <= 13))
-		nptr++;
-	if (*nptr == '+' || *nptr == '-')
+	while (*str == ' ' || (*str >= 9 && *str <= 13))
+		str++;
+	if (*str == '+' || *str == '-')
 	{
-		if (*nptr == '-')
+		if (*str == '-')
 			signal = signal * -1;
-		nptr++;
+		str++;
 	}
-	while (*nptr >= '0' && *nptr <= '9')
+	while (*str >= '0' && *str <= '9')
 	{
-		result = (result * 10) + (*nptr - '0');
-		nptr++;
+		result = (result * 10) + (*str - '0');
+		str++;
 	}
 	return (result * signal);
 }
 
 void	send_signal(int pid, unsigned char character)
 {
-	int				i;
+	int		i;
 	char	temp_char;
 
 	i = 8;
@@ -52,23 +51,27 @@ void	send_signal(int pid, unsigned char character)
 			kill(pid, SIGUSR2);
 		else
 			kill(pid, SIGUSR1);
-		usleep(42);
+		usleep(200);
 	}
 }
 
 int	main(int argc, char **argv)
 {
-	pid_t		server_id;
-	char	*message;
-	int	i;
+	pid_t	server_id;
+	int		i;
 
 	if (argc != 3)
-		ft_printf("Usage: ./minitalk <pid> <message>\n");
+	{
+		write(1, "Usage: ./client <pid> <message>\n", 32);
+		return (1);
+	}
 	server_id = ft_atoi(argv[1]);
-	message = argv[2];
-	i = -1;
-	while (message[++i])
-		send_signal(server_id, message[i]);
+	i = 0;
+	while (argv[2][i])
+	{
+		send_signal(server_id, argv[2][i]);
+		i++;
+	}
 	send_signal(server_id, '\0');
 	return (0);
 }
