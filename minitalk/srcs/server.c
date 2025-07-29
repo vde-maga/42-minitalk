@@ -5,47 +5,54 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: vde-maga <vde-maga@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/16 16:45:53 by vde-maga          #+#    #+#             */
-/*   Updated: 2025/07/23 16:37:36 by vde-maga         ###   ########.fr       */
+/*   Created: 2025/07/23 14:56:00 by vde-maga          #+#    #+#             */
+/*   Updated: 2025/07/29 17:57:01 by vde-maga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minitalk.h"
 
-static void	ft_handle_signal(int sig, siginfo_t *info, void *context)
+static void	ft_process_byte(t_state *state)
 {
-	static unsigned char	current_char;
-	static int				bit_count;
-	pid_t					client_pid;
+	if (state->current_char == '\0')
+		write(1, "\n", 1);
+	else
+		write(1, &state->current_char, 1);
+	state->bit_count = 0;
+	state->current_char = 0;
+}
+
+static void	ft_signal_handler(int sig, siginfo_t *info, void *context)
+{
+	static t_state	state = {0, 0};
 
 	(void)context;
-	client_pid = info->si_pid;
-	current_char = (current_char << 1) | (sig == SIGUSR1);
-	bit_count++;
-	if (bit_count == 8)
+	state.current_char = (state.current_char << 1) | (sig == SIGUSR1);
+	state.bit_count++;
+	if (state.bit_count == 8)
+		ft_process_byte(&state);
+	if (kill(info->si_pid, SIGUSR1) == -1)
 	{
-		if (current_char == '\0')
-			write(1, "\n", 1);
-		else
-			write(1, &current_char, 1);
-		bit_count = 0;
-		current_char = 0;
+		state.bit_count = 0;
+		state.current_char = 0;
 	}
-	kill(client_pid, SIGUSR1);
 }
 
 int	main(void)
 {
-	struct sigaction	act;
+	struct sigaction	s_sa;
 
+	write(1, "Server PID: ", 12);
 	ft_putnbr(getpid());
 	write(1, "\n", 1);
-	act.sa_sigaction = ft_handle_signal;
-	sigemptyset(&act.sa_mask);
-	act.sa_flags = SA_SIGINFO;
-	sigaction(SIGUSR1, &act, NULL);
-	sigaction(SIGUSR2, &act, NULL);
-	while (1)
+	s_sa.sa_sigaction = ft_signal_handler;
+	sigemptyset(&s_sa.sa_mask);
+	s_sa.sa_flags = SA_SIGINFO | SA_RESTART;
+	if (sigaction(SIGUSR1, &s_sa, NULL) == -1)
+		ft_error_exit("Error setting SIGUSR1 handler\n");
+	if (sigaction(SIGUSR2, &s_sa, NULL) == -1)
+		ft_error_exit("Error setting SIGUSR2 handler\n");
+	while (LIVE)
 		pause();
 	return (0);
 }

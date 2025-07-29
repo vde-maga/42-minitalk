@@ -6,7 +6,7 @@
 /*   By: vde-maga <vde-maga@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 14:58:20 by vde-maga          #+#    #+#             */
-/*   Updated: 2025/07/29 15:40:45 by vde-maga         ###   ########.fr       */
+/*   Updated: 2025/07/29 16:51:04 by vde-maga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 # include <signal.h>
 # include <stdlib.h>
 # include <unistd.h>
+
+# define LIVE 1
 
 typedef struct s_state
 {

@@ -6,7 +6,7 @@
 /*   By: vde-maga <vde-maga@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 15:05:42 by vde-maga          #+#    #+#             */
-/*   Updated: 2025/07/29 15:40:16 by vde-maga         ###   ########.fr       */
+/*   Updated: 2025/07/29 18:08:04 by vde-maga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void	ft_error_exit(const char *message)
 
 int	ft_atoi(const char *str)
 {
-	long	pid;
+	int	pid;
 
 	pid = 0;
 	if (!str)
@@ -35,9 +35,9 @@ int	ft_atoi(const char *str)
 		pid = pid * 10 + (*str - '0');
 		str++;
 	}
-	if (*str != '\0' || pid <= 100 || pid > 99999)
+	if (*str != '\0' || pid <= 100 || pid > 99999 || pid <= 0)
 		ft_error_exit("Error: Invalid PID format or value.\n");
-	return ((int)pid);
+	return (pid);
 }
 
 void	ft_putnbr(int n)

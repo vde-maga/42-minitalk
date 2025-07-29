@@ -6,7 +6,7 @@
 /*   By: vde-maga <vde-maga@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/23 14:59:30 by vde-maga          #+#    #+#             */
-/*   Updated: 2025/07/29 15:40:27 by vde-maga         ###   ########.fr       */
+/*   Updated: 2025/07/29 17:52:12 by vde-maga         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,15 +67,15 @@ static void	send_message(pid_t server_pid, const char *message)
 int	main(int argc, char **argv)
 {
 	pid_t				server_pid;
-	struct sigaction	sa;
+	struct sigaction	s_sa;
 
 	if (argc != 3 || !argv[2][0])
 		ft_error_exit("Usage: ./client <Server_PID> <Message>\n");
 	server_pid = ft_atoi(argv[1]);
-	sa.sa_handler = ack_handler;
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = 0;
-	if (sigaction(SIGUSR1, &sa, NULL) == -1)
+	s_sa.sa_handler = ack_handler;
+	sigemptyset(&s_sa.sa_mask);
+	s_sa.sa_flags = 0;
+	if (sigaction(SIGUSR1, &s_sa, NULL) == -1)
 		ft_error_exit("Error: Failed to set signal handler.\n");
 	send_message(server_pid, argv[2]);
 	write(1, "Message sent successfully!\n", 27);
